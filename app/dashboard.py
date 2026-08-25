@@ -30,7 +30,22 @@ st.set_page_config(page_title="SEZARNEXT", page_icon="◆", layout="wide")
 
 @st.cache_data
 def _load():
-    return load_campaigns()
+    """
+    Kayıtları yükler. Bulut dağıtımlarında data/processed depoya dahil
+    edilmediği için (bkz. .gitignore) demo verisi ilk açılışta üretilir.
+    """
+    items = load_campaigns()
+    if not items:
+        from demo.build_demo_data import build
+
+        items = build()
+        try:
+            from collectors.store import save_campaigns
+
+            save_campaigns(items)
+        except Exception:
+            pass  # salt-okunur dosya sistemi — bellekte devam edilir
+    return items
 
 
 CAMPAIGNS = _load()
