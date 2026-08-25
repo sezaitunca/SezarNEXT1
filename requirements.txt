@@ -1,0 +1,26 @@
+# SEZARNEXT — bağımlılıklar
+# Çekirdek (NLP Core, Benefit Engine, Knowledge Layer, SEZAR Agent) yalnızca
+# pydantic gerektirir; geri kalanı arayüz ve toplama katmanı içindir.
+
+# --- Çekirdek ---
+pydantic>=2.6,<3.0
+
+# --- Veri toplama ---
+requests>=2.31
+beautifulsoup4>=4.12
+lxml>=5.0
+
+# --- Arayüz ---
+fastapi>=0.110
+uvicorn[standard]>=0.27
+streamlit>=1.32
+pandas>=2.2
+
+# --- Test ---
+pytest>=8.0
+
+# --- Opsiyonel: vektör arama ve yerel embedding ---
+# Kurulmazsa sistem BM25'e düşer (graceful degradation).
+# qdrant-client>=1.8
+# sentence-transformers>=2.6
+# faiss-cpu>=1.8

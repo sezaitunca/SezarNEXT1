@@ -1,0 +1,49 @@
+# SEZARNEXT Local AI Stack
+# Harici yapay zekâ API'si olmadan, tamamen kurum içinde çalışır.
+services:
+  api:
+    build: .
+    container_name: sezarnext-api
+    ports: ["8000:8000"]
+    environment:
+      - SEZARNEXT_LLM_ENABLED=1
+      - SEZARNEXT_LLM_URL=http://llm:11434/api/generate
+      - SEZARNEXT_LLM_MODEL=qwen2.5:7b-instruct
+      - DATABASE_URL=postgresql://sezar:sezar@db:5432/sezarnext
+    volumes: ["./data:/app/data"]
+    depends_on: [db]
+
+  dashboard:
+    build: .
+    container_name: sezarnext-dashboard
+    command: streamlit run app/dashboard.py --server.port 8501 --server.address 0.0.0.0
+    ports: ["8501:8501"]
+    volumes: ["./data:/app/data"]
+    depends_on: [api]
+
+  db:
+    image: postgres:16-alpine
+    container_name: sezarnext-db
+    environment:
+      POSTGRES_USER: sezar
+      POSTGRES_PASSWORD: sezar
+      POSTGRES_DB: sezarnext
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+
+  vector:
+    image: qdrant/qdrant:latest
+    container_name: sezarnext-vector
+    ports: ["6333:6333"]
+    volumes: ["qdrant:/qdrant/storage"]
+
+  llm:
+    image: ollama/ollama:latest
+    container_name: sezarnext-llm
+    ports: ["11434:11434"]
+    volumes: ["ollama:/root/.ollama"]
+    # Model indirme: docker exec sezarnext-llm ollama pull qwen2.5:7b-instruct
+
+volumes:
+  pgdata:
+  qdrant:
+  ollama:
